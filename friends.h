@@ -14,7 +14,6 @@
 		}							\
 	} while (0)
 
-
 /**
  * Function that handles the input for the friends task
  *
