@@ -124,7 +124,7 @@ void common(int ***matrix, char *name)
 	for (int i = 0; i < MAX_PEOPLE; i++)
 		if ((*matrix)[ind1][i] == 1 && (*matrix)[ind2][i] == 1)
 			common[number_of_common++] = i;
-	
+
 	if (number_of_common == 0) {
 		printf("No common friends for %s and %s\n",
 			   get_user_name(ind1), get_user_name(ind2));
@@ -142,13 +142,13 @@ void friends(int ***matrix, char *name)
 {
 	name = strtok(NULL, "\n ");
 	int ind = get_user_id(name);
-	
+
 	int number_of_friends = 0;
 
 	for (int i = 0; i < MAX_PEOPLE; i++)
 		if ((*matrix)[ind][i] == 1)
 			number_of_friends++;
-	
+
 	printf("%s has %d friends\n", get_user_name(ind), number_of_friends);
 }
 
