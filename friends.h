@@ -72,3 +72,4 @@ void popular(int ***matrix, char *name);
 void handle_input_friends(char *input, int ***matrix);
 
 #endif // FRIENDS_H
+
