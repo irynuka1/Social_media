@@ -13,8 +13,7 @@ void add_friend(int ***matrix, char *name)
 	int ind2 = get_user_id(name);
 	(*matrix)[ind1][ind2] = 1;
 	(*matrix)[ind2][ind1] = 1;
-	printf("Added connection %s - %s\n", get_user_name(ind1),
-		   get_user_name(ind2));
+	printf("Added connection %s - %s\n", get_user_name(ind1), get_user_name(ind2));
 }
 
 void remove_friend(int ***matrix, char *name)
@@ -25,8 +24,7 @@ void remove_friend(int ***matrix, char *name)
 	int ind2 = get_user_id(name);
 	(*matrix)[ind1][ind2] = 0;
 	(*matrix)[ind2][ind1] = 0;
-	printf("Removed connection %s - %s\n", get_user_name(ind1),
-		   get_user_name(ind2));
+	printf("Removed connection %s - %s\n", get_user_name(ind1), get_user_name(ind2));
 }
 
 void suggestions(int ***matrix, char *name)
@@ -67,6 +65,48 @@ void suggestions(int ***matrix, char *name)
 	free(suggestions);
 }
 
+void distance(int ***matrix, char *name)
+{
+	name = strtok(NULL, "\n ");
+	int ind1 = get_user_id(name);
+	name = strtok(NULL, "\n ");
+	int ind2 = get_user_id(name);
+
+	int *visited = calloc(MAX_PEOPLE, sizeof(int));
+	int *queue = malloc(MAX_PEOPLE * sizeof(int));
+	int *dist = malloc(MAX_PEOPLE * sizeof(int));
+	int front = 0, rear = 0;
+	for (int i = 0; i < MAX_PEOPLE; i++)
+		dist[i] = -1;
+
+	queue[rear++] = ind1;
+	visited[ind1] = 1;
+	dist[ind1] = 0;
+
+	while (front < rear) {
+		int current = queue[front++];
+		for (int i = 0; i < MAX_PEOPLE; i++)
+			if ((*matrix)[current][i] && !visited[i]) {
+				visited[i] = 1;
+				dist[i] = dist[current] + 1;
+				queue[rear++] = i;
+			}
+	}
+
+	char *name1 = get_user_name(ind1);
+	char *name2 = get_user_name(ind2);
+
+	if (dist[ind2] == -1)
+		printf("There is no way to get from %s to %s\n", name1, name2);
+	else
+		printf("The distance between %s - %s is %d\n", name1, name2, dist[ind2]);
+
+	free(visited);
+	free(queue);
+	free(dist);
+}
+
+
 void handle_input_friends(char *input, int ***matrix)
 {
 	char *commands = strdup(input);
@@ -78,8 +118,16 @@ void handle_input_friends(char *input, int ***matrix)
 		add_friend(matrix, cmd);
 	else if (!strcmp(cmd, "remove"))
 		remove_friend(matrix, cmd);
-	else if (!strcmp(cmd, "suggestions"))
+	else if (!strcmp(cmd, "suggestions")) {
 		suggestions(matrix, cmd);
-
+	}
+	else if (!strcmp(cmd, "distance"))
+		distance(matrix, cmd);
+	else if (!strcmp(cmd, "common")) {
+	}
+	else if (!strcmp(cmd, "friends")){
+	}
+	else if (!strcmp(cmd, "popular")) {
+	}
 	free(commands);
 }
