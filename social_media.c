@@ -15,17 +15,17 @@
 */
 void init_tasks(void)
 {
-	#ifdef TASK_1
+    #ifdef TASK_1
 
-	#endif
+    #endif
 
-	#ifdef TASK_2
+    #ifdef TASK_2
 
-	#endif
+    #endif
 
-	#ifdef TASK_3
+    #ifdef TASK_3
 
-	#endif
+    #endif
 }
 
 /**
@@ -33,33 +33,36 @@ void init_tasks(void)
 */
 int main(void)
 {
-	init_users();
+    init_users();
 
-	init_tasks();
+    init_tasks();
+    char *result = NULL, *input = (char *)malloc(MAX_COMMAND_LEN);
+    int **matrix = malloc(MAX_PEOPLE * sizeof(int *));
+    for(int i = 0; i < MAX_PEOPLE; i++)
+        matrix[i] = calloc(MAX_PEOPLE, sizeof(int));
+    while (1) {
+        result = fgets(input, MAX_COMMAND_LEN, stdin);
 
-	char *input = (char *)malloc(MAX_COMMAND_LEN);
-	while (1) {
-		char *command = fgets(input, MAX_COMMAND_LEN, stdin);
+        // If fgets returns null, we reached EOF
+        if (!result)
+            break;
 
-		// If fgets returns null, we reached EOF
-		if (!command)
-			break;
+        #ifdef TASK_1
+        handle_input_friends(input, &matrix);
+        #endif
 
-		#ifdef TASK_1
-		handle_input_friends(input);
-		#endif
+        #ifdef TASK_2
+        handle_input_posts(input);
+        #endif
 
-		#ifdef TASK_2
-		handle_input_posts(input);
-		#endif
-
-		#ifdef TASK_3
-		handle_input_feed(input);
-		#endif
-	}
-
-	free_users();
-	free(input);
-
-	return 0;
+        #ifdef TASK_3
+        handle_input_feed(input);
+        #endif
+    }
+    for(int i = 0; i < MAX_PEOPLE; i++)
+        free(matrix[i]);
+    free(matrix);
+    free(input);
+    free_users();
+    return 0;
 }
