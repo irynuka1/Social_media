@@ -223,3 +223,4 @@ void handle_input_friends(char *input, int ***matrix)
 
 	free(commands);
 }
+
