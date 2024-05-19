@@ -6,28 +6,24 @@
 #include "friends.h"
 #include "users.h"
 
-void add_friend(int ***matrix, char *name)
+void add_remove_friend(int ***matrix, char *names, int op_type)
 {
-	name = strtok(NULL, "\n ");
-	int ind1 = get_user_id(name);
-	name = strtok(NULL, "\n ");
-	int ind2 = get_user_id(name);
-	(*matrix)[ind1][ind2] = 1;
-	(*matrix)[ind2][ind1] = 1;
-	printf("Added connection %s - %s\n", get_user_name(ind1),
-		   get_user_name(ind2));
-}
+	// Get the id of the users
+	names = strtok(NULL, "\n ");
+	int id1 = get_user_id(names);
+	names = strtok(NULL, "\n ");
+	int id2 = get_user_id(names);
 
-void remove_friend(int ***matrix, char *name)
-{
-	name = strtok(NULL, "\n ");
-	int ind1 = get_user_id(name);
-	name = strtok(NULL, "\n ");
-	int ind2 = get_user_id(name);
-	(*matrix)[ind1][ind2] = 0;
-	(*matrix)[ind2][ind1] = 0;
-	printf("Removed connection %s - %s\n", get_user_name(ind1),
-		   get_user_name(ind2));
+	// Add or remove the connection between the users
+	(*matrix)[id1][id2] = op_type;
+	(*matrix)[id2][id1] = op_type;
+
+	if (op_type == 1)
+		printf("Added connection %s - %s\n", get_user_name(id1),
+			   get_user_name(id2));
+	else
+		printf("Removed connection %s - %s\n", get_user_name(id1),
+			   get_user_name(id2));
 }
 
 void suggestions(int ***matrix, char *name)
@@ -69,24 +65,31 @@ void suggestions(int ***matrix, char *name)
 	free(visited);
 }
 
-void distance(int ***matrix, char *name)
+void distance(int ***matrix, char *names)
 {
-	name = strtok(NULL, "\n ");
-	int ind1 = get_user_id(name);
-	name = strtok(NULL, "\n ");
-	int ind2 = get_user_id(name);
+	// Get the id of the users
+	names = strtok(NULL, "\n ");
+	int id1 = get_user_id(names);
+	names = strtok(NULL, "\n ");
+	int id2 = get_user_id(names);
 
 	int *visited = calloc(MAX_PEOPLE, sizeof(int));
+	DIE(!visited, "Calloc failed!");
 	int *queue = malloc(MAX_PEOPLE * sizeof(int));
+	DIE(!queue, "Malloc failed!");
 	int *dist = malloc(MAX_PEOPLE * sizeof(int));
+	DIE(!dist, "Malloc failed!");
 	int front = 0, rear = 0;
+	// Initialize the visited array
 	for (int i = 0; i < MAX_PEOPLE; i++)
 		dist[i] = -1;
 
-	queue[rear++] = ind1;
-	visited[ind1] = 1;
-	dist[ind1] = 0;
+	// Add the first user to the queue
+	queue[rear++] = id1;
+	visited[id1] = 1;
+	dist[id1] = 0;
 
+	// BFS
 	while (front < rear) {
 		int current = queue[front++];
 		for (int i = 0; i < MAX_PEOPLE; i++)
@@ -97,41 +100,45 @@ void distance(int ***matrix, char *name)
 			}
 	}
 
-	char *name1 = get_user_name(ind1);
-	char *name2 = get_user_name(ind2);
-
-	if (dist[ind2] == -1)
-		printf("There is no way to get from %s to %s\n", name1, name2);
+	// Print the distance between the users if there is a path
+	if (dist[id2] == -1)
+		printf("There is no way to get from %s to %s\n", get_user_name(id1),
+			   get_user_name(id2));
 	else
-		printf("The distance between %s - %s is %d\n", name1, name2,
-			   dist[ind2]);
+		printf("The distance between %s - %s is %d\n", get_user_name(id1),
+			   get_user_name(id2), dist[id2]);
 
 	free(visited);
 	free(queue);
 	free(dist);
 }
 
-void common(int ***matrix, char *name)
+void common(int ***matrix, char *names)
 {
-	name = strtok(NULL, "\n ");
-	int ind1 = get_user_id(name);
-	name = strtok(NULL, "\n ");
-	int ind2 = get_user_id(name);
+	// Get the id of the users
+	names = strtok(NULL, "\n ");
+	int id1 = get_user_id(names);
+	names = strtok(NULL, "\n ");
+	int id2 = get_user_id(names);
 
-	int number_of_common = 0;
-	int *common = (int *)calloc(MAX_PEOPLE, sizeof(int));
+	int no_friends = 0;
+	int *common = malloc(MAX_PEOPLE * sizeof(int));
+	DIE(!common, "Malloc failed!");
 
+	// Find the common friends
 	for (int i = 0; i < MAX_PEOPLE; i++)
-		if ((*matrix)[ind1][i] == 1 && (*matrix)[ind2][i] == 1)
-			common[number_of_common++] = i;
+		if ((*matrix)[id1][i] == 1 && (*matrix)[id2][i] == 1)
+			common[no_friends++] = i;
 
-	if (number_of_common == 0) {
-		printf("No common friends for %s and %s\n",
-			   get_user_name(ind1), get_user_name(ind2));
+	// Print the common friends if there are any
+	if (no_friends == 0) {
+		printf("No common friends for %s and %s\n", get_user_name(id1),
+			   get_user_name(id2));
 	} else {
 		printf("The common friends between %s and %s are:\n",
-			   get_user_name(ind1), get_user_name(ind2));
-		for (int i = 0; i < number_of_common; i++)
+			   get_user_name(id1), get_user_name(id2));
+
+		for (int i = 0; i < no_friends; i++)
 			printf("%s\n", get_user_name(common[i]));
 	}
 
@@ -140,48 +147,56 @@ void common(int ***matrix, char *name)
 
 void friends(int ***matrix, char *name)
 {
+	// Get the id of the user
 	name = strtok(NULL, "\n ");
 	int ind = get_user_id(name);
 
-	int number_of_friends = 0;
+	int no_friends = 0;
 
+	// Find the number of friends
 	for (int i = 0; i < MAX_PEOPLE; i++)
 		if ((*matrix)[ind][i] == 1)
-			number_of_friends++;
+			no_friends++;
 
-	printf("%s has %d friends\n", get_user_name(ind), number_of_friends);
+	printf("%s has %d friends\n", get_user_name(ind), no_friends);
 }
 
 void popular(int ***matrix, char *name)
 {
+	// Get the id of the user
 	name = strtok(NULL, "\n ");
-	int ind = get_user_id(name);
+	int id = get_user_id(name);
 
-	int most_popular = ind;
-	int number_of_friends_popular = 0;
+	int most_popular = id;
+	int popular_friends = 0;
 
+	// Find number of friends of the user
 	for (int i = 0; i < MAX_PEOPLE; i++)
-		if ((*matrix)[ind][i] == 1)
-			number_of_friends_popular++;
+		if ((*matrix)[id][i] == 1)
+			popular_friends++;
 
+	// Find the user with the most friends
 	for (int i = 0; i < MAX_PEOPLE; i++) {
-		if ((*matrix)[ind][i] == 1) {
-			int number_of_friends = 0;
+		if ((*matrix)[id][i] == 1) {
+			int no_friends = 0;
+
 			for (int j = 0; j < MAX_PEOPLE; j++)
 				if ((*matrix)[i][j] == 1)
-					number_of_friends++;
-			if (number_of_friends > number_of_friends_popular) {
-				number_of_friends_popular = number_of_friends;
+					no_friends++;
+
+			if (no_friends > popular_friends) {
+				popular_friends = no_friends;
 				most_popular = i;
 			}
 		}
 	}
 
-	if (most_popular == ind)
-		printf("%s is the most popular\n", get_user_name(ind));
+	// Print the most popular user
+	if (most_popular == id)
+		printf("%s is the most popular\n", get_user_name(id));
 	else
 		printf("%s is the most popular friend of %s\n",
-			   get_user_name(most_popular), get_user_name(ind));
+			   get_user_name(most_popular), get_user_name(id));
 }
 
 void handle_input_friends(char *input, int ***matrix)
@@ -192,9 +207,9 @@ void handle_input_friends(char *input, int ***matrix)
 	if (!cmd)
 		return;
 	if (!strcmp(cmd, "add"))
-		add_friend(matrix, cmd);
+		add_remove_friend(matrix, cmd, 1);
 	else if (!strcmp(cmd, "remove"))
-		remove_friend(matrix, cmd);
+		add_remove_friend(matrix, cmd, 0);
 	else if (!strcmp(cmd, "suggestions"))
 		suggestions(matrix, cmd);
 	else if (!strcmp(cmd, "distance"))
