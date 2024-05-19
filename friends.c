@@ -32,47 +32,40 @@ void remove_friend(int ***matrix, char *name)
 void suggestions(int ***matrix, char *name)
 {
 	name = strtok(NULL, "\n ");
-	int ind = get_user_id(name);
-	int *suggestions = (int *)calloc(MAX_PEOPLE, sizeof(int));
-	int suggestions_len = 0;
+	int id = get_user_id(name), check = 0;
+	int *suggestions = calloc(MAX_PEOPLE, sizeof(int));
+	DIE(!suggestions, "Calloc failed!");
+	int *visited = calloc(MAX_PEOPLE, sizeof(int));
+	DIE(!visited, "Calloc failed!");
 
-	for (int i = 0; i < MAX_PEOPLE; i++) {
-		if ((*matrix)[ind][i] == 1) {
-			for (int j = 0; j < MAX_PEOPLE; j++) {
-				if ((*matrix)[i][j] == 1 && (*matrix)[ind][j] == 0 &&
-					j != ind) {
-					int found = 0;
-					for (int k = 0; k < suggestions_len; k++) {
-						if (suggestions[k] == j) {
-							found = 1;
-							break;
-						}
-					}
-					if (!found)
-						suggestions[suggestions_len++] = j;
+	// Mark the current user as visited
+	visited[id] = 1;
+	// Mark the friends of the current user as visited
+	for (int i = 0; i < MAX_PEOPLE; i++)
+		if ((*matrix)[id][i] == 1)
+			visited[i] = 1;
+
+	// Find the friends of the friends
+	for (int i = 0; i < MAX_PEOPLE; i++)
+		if ((*matrix)[id][i] == 1)
+			for (int j = 0; j < MAX_PEOPLE; j++)
+				if ((*matrix)[i][j] && !(*matrix)[id][j] && j != id) {
+					suggestions[j] = 1;
+					check = 1;
 				}
-			}
-		}
-	}
 
-	// Sort the suggestions vector
-	for (int i = 0; i < suggestions_len - 1; i++)
-		for (int j = i + 1; j < suggestions_len; j++)
-			if (suggestions[i] > suggestions[j]) {
-				int aux = suggestions[i];
-				suggestions[i] = suggestions[j];
-				suggestions[j] = aux;
-			}
-
-	if (suggestions_len == 0) {
-		printf("There are no suggestions for %s\n", get_user_name(ind));
+	// Print the suggestions if there are any
+	if (check == 0) {
+		printf("There are no suggestions for %s\n", name);
 	} else {
-		printf("Suggestions for %s:\n", get_user_name(ind));
-		for (int i = 0; i < suggestions_len; i++)
-			printf("%s\n", get_user_name(suggestions[i]));
+		printf("Suggestions for %s:\n", name);
+		for (int i = 0; i < MAX_PEOPLE; i++)
+			if (suggestions[i])
+				printf("%s\n", get_user_name(i));
 	}
 
 	free(suggestions);
+	free(visited);
 }
 
 void distance(int ***matrix, char *name)
