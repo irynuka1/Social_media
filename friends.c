@@ -13,7 +13,8 @@ void add_friend(int ***matrix, char *name)
 	int ind2 = get_user_id(name);
 	(*matrix)[ind1][ind2] = 1;
 	(*matrix)[ind2][ind1] = 1;
-	printf("Added connection %s - %s\n", get_user_name(ind1), get_user_name(ind2));
+	printf("Added connection %s - %s\n", get_user_name(ind1),
+		   get_user_name(ind2));
 }
 
 void remove_friend(int ***matrix, char *name)
@@ -24,7 +25,8 @@ void remove_friend(int ***matrix, char *name)
 	int ind2 = get_user_id(name);
 	(*matrix)[ind1][ind2] = 0;
 	(*matrix)[ind2][ind1] = 0;
-	printf("Removed connection %s - %s\n", get_user_name(ind1), get_user_name(ind2));
+	printf("Removed connection %s - %s\n", get_user_name(ind1),
+		   get_user_name(ind2));
 }
 
 void suggestions(int ***matrix, char *name)
@@ -46,13 +48,21 @@ void suggestions(int ***matrix, char *name)
 							break;
 						}
 					}
-					if (!found) {
+					if (!found)
 						suggestions[suggestions_len++] = j;
-					}
 				}
 			}
 		}
 	}
+
+	// Sort the suggestions vector
+	for (int i = 0; i < suggestions_len - 1; i++)
+		for (int j = i + 1; j < suggestions_len; j++)
+			if (suggestions[i] > suggestions[j]) {
+				int aux = suggestions[i];
+				suggestions[i] = suggestions[j];
+				suggestions[j] = aux;
+			}
 
 	if (suggestions_len == 0) {
 		printf("There are no suggestions for %s\n", get_user_name(ind));
@@ -99,13 +109,86 @@ void distance(int ***matrix, char *name)
 	if (dist[ind2] == -1)
 		printf("There is no way to get from %s to %s\n", name1, name2);
 	else
-		printf("The distance between %s - %s is %d\n", name1, name2, dist[ind2]);
+		printf("The distance between %s - %s is %d\n", name1, name2,
+			   dist[ind2]);
 
 	free(visited);
 	free(queue);
 	free(dist);
 }
 
+void common(int ***matrix, char *name)
+{
+	name = strtok(NULL, "\n ");
+	int ind1 = get_user_id(name);
+	name = strtok(NULL, "\n ");
+	int ind2 = get_user_id(name);
+
+	int number_of_common = 0;
+	int *common = (int *)calloc(MAX_PEOPLE, sizeof(int));
+
+	for (int i = 0; i < MAX_PEOPLE; i++)
+		if ((*matrix)[ind1][i] == 1 && (*matrix)[ind2][i] == 1)
+			common[number_of_common++] = i;
+	
+	if (number_of_common == 0) {
+		printf("No common friends for %s and %s\n",
+			   get_user_name(ind1), get_user_name(ind2));
+	} else {
+		printf("The common friends between %s and %s are:\n",
+			   get_user_name(ind1), get_user_name(ind2));
+		for (int i = 0; i < number_of_common; i++)
+			printf("%s\n", get_user_name(common[i]));
+	}
+
+	free(common);
+}
+
+void friends(int ***matrix, char *name)
+{
+	name = strtok(NULL, "\n ");
+	int ind = get_user_id(name);
+	
+	int number_of_friends = 0;
+
+	for (int i = 0; i < MAX_PEOPLE; i++)
+		if ((*matrix)[ind][i] == 1)
+			number_of_friends++;
+	
+	printf("%s has %d friends\n", get_user_name(ind), number_of_friends);
+}
+
+void popular(int ***matrix, char *name)
+{
+	name = strtok(NULL, "\n ");
+	int ind = get_user_id(name);
+
+	int most_popular = ind;
+	int number_of_friends_popular = 0;
+
+	for (int i = 0; i < MAX_PEOPLE; i++)
+		if ((*matrix)[ind][i] == 1)
+			number_of_friends_popular++;
+
+	for (int i = 0; i < MAX_PEOPLE; i++) {
+		if ((*matrix)[ind][i] == 1) {
+			int number_of_friends = 0;
+			for (int j = 0; j < MAX_PEOPLE; j++)
+				if ((*matrix)[i][j] == 1)
+					number_of_friends++;
+			if (number_of_friends > number_of_friends_popular) {
+				number_of_friends_popular = number_of_friends;
+				most_popular = i;
+			}
+		}
+	}
+
+	if (most_popular == ind)
+		printf("%s is the most popular\n", get_user_name(ind));
+	else
+		printf("%s is the most popular friend of %s\n",
+			   get_user_name(most_popular), get_user_name(ind));
+}
 
 void handle_input_friends(char *input, int ***matrix)
 {
@@ -118,16 +201,16 @@ void handle_input_friends(char *input, int ***matrix)
 		add_friend(matrix, cmd);
 	else if (!strcmp(cmd, "remove"))
 		remove_friend(matrix, cmd);
-	else if (!strcmp(cmd, "suggestions")) {
+	else if (!strcmp(cmd, "suggestions"))
 		suggestions(matrix, cmd);
-	}
 	else if (!strcmp(cmd, "distance"))
 		distance(matrix, cmd);
-	else if (!strcmp(cmd, "common")) {
-	}
-	else if (!strcmp(cmd, "friends")){
-	}
-	else if (!strcmp(cmd, "popular")) {
-	}
+	else if (!strcmp(cmd, "common"))
+		common(matrix, cmd);
+	else if (!strcmp(cmd, "friends"))
+		friends(matrix, cmd);
+	else if (!strcmp(cmd, "popular"))
+		popular(matrix, cmd);
+
 	free(commands);
 }
