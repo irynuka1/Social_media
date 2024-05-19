@@ -1,14 +1,14 @@
 #ifndef FRIENDS_H
 #define FRIENDS_H
 
-#define MAX_COMMAND_LEN 500
+#define MAX_COMMAND_LEN 280
 #define MAX_PEOPLE 550
 
 /**
- * Function that handles the calling of every command from task 1
+ * Function that handles the input for the friends task
  *
- * Please add any necessary parameters to the functions
+ * @param input - the input string
 */
-void handle_input_friends(char *input);
+void handle_input_friends(char *input, int ***matrix);
 
 #endif // FRIENDS_H
