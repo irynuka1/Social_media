@@ -6,7 +6,7 @@
 #include "friends.h"
 #include "users.h"
 
-void add_remove_friend(int ***matrix, char *names, int op_type)
+void add_remove_friend(int **matrix, char *names, int op_type)
 {
 	// Get the id of the users
 	names = strtok(NULL, "\n ");
@@ -15,8 +15,8 @@ void add_remove_friend(int ***matrix, char *names, int op_type)
 	int id2 = get_user_id(names);
 
 	// Add or remove the connection between the users
-	(*matrix)[id1][id2] = op_type;
-	(*matrix)[id2][id1] = op_type;
+	matrix[id1][id2] = op_type;
+	matrix[id2][id1] = op_type;
 
 	if (op_type == 1)
 		printf("Added connection %s - %s\n", get_user_name(id1),
@@ -26,7 +26,7 @@ void add_remove_friend(int ***matrix, char *names, int op_type)
 			   get_user_name(id2));
 }
 
-void suggestions(int ***matrix, char *name)
+void suggestions(int **matrix, char *name)
 {
 	name = strtok(NULL, "\n ");
 	int id = get_user_id(name), check = 0;
@@ -39,14 +39,14 @@ void suggestions(int ***matrix, char *name)
 	visited[id] = 1;
 	// Mark the friends of the current user as visited
 	for (int i = 0; i < MAX_PEOPLE; i++)
-		if ((*matrix)[id][i] == 1)
+		if (matrix[id][i] == 1)
 			visited[i] = 1;
 
 	// Find the friends of the friends
 	for (int i = 0; i < MAX_PEOPLE; i++)
-		if ((*matrix)[id][i] == 1)
+		if (matrix[id][i] == 1)
 			for (int j = 0; j < MAX_PEOPLE; j++)
-				if ((*matrix)[i][j] && !(*matrix)[id][j] && j != id) {
+				if (matrix[i][j] && !matrix[id][j] && j != id) {
 					suggestions[j] = 1;
 					check = 1;
 				}
@@ -65,7 +65,7 @@ void suggestions(int ***matrix, char *name)
 	free(visited);
 }
 
-void distance(int ***matrix, char *names)
+void distance(int **matrix, char *names)
 {
 	// Get the id of the users
 	names = strtok(NULL, "\n ");
@@ -93,7 +93,7 @@ void distance(int ***matrix, char *names)
 	while (front < rear) {
 		int current = queue[front++];
 		for (int i = 0; i < MAX_PEOPLE; i++)
-			if ((*matrix)[current][i] && !visited[i]) {
+			if(matrix[current][i] && !visited[i]) {
 				visited[i] = 1;
 				dist[i] = dist[current] + 1;
 				queue[rear++] = i;
@@ -113,7 +113,7 @@ void distance(int ***matrix, char *names)
 	free(dist);
 }
 
-void common(int ***matrix, char *names)
+void common(int **matrix, char *names)
 {
 	// Get the id of the users
 	names = strtok(NULL, "\n ");
@@ -127,7 +127,7 @@ void common(int ***matrix, char *names)
 
 	// Find the common friends
 	for (int i = 0; i < MAX_PEOPLE; i++)
-		if ((*matrix)[id1][i] == 1 && (*matrix)[id2][i] == 1)
+		if (matrix[id1][i] == 1 && matrix[id2][i] == 1)
 			common[no_friends++] = i;
 
 	// Print the common friends if there are any
@@ -145,7 +145,7 @@ void common(int ***matrix, char *names)
 	free(common);
 }
 
-void friends(int ***matrix, char *name)
+void friends(int **matrix, char *name)
 {
 	// Get the id of the user
 	name = strtok(NULL, "\n ");
@@ -155,13 +155,13 @@ void friends(int ***matrix, char *name)
 
 	// Find the number of friends
 	for (int i = 0; i < MAX_PEOPLE; i++)
-		if ((*matrix)[ind][i] == 1)
+		if (matrix[ind][i] == 1)
 			no_friends++;
 
 	printf("%s has %d friends\n", get_user_name(ind), no_friends);
 }
 
-void popular(int ***matrix, char *name)
+void popular(int **matrix, char *name)
 {
 	// Get the id of the user
 	name = strtok(NULL, "\n ");
@@ -172,16 +172,16 @@ void popular(int ***matrix, char *name)
 
 	// Find number of friends of the user
 	for (int i = 0; i < MAX_PEOPLE; i++)
-		if ((*matrix)[id][i] == 1)
+		if (matrix[id][i] == 1)
 			popular_friends++;
 
 	// Find the user with the most friends
 	for (int i = 0; i < MAX_PEOPLE; i++) {
-		if ((*matrix)[id][i] == 1) {
+		if (matrix[id][i] == 1) {
 			int no_friends = 0;
 
 			for (int j = 0; j < MAX_PEOPLE; j++)
-				if ((*matrix)[i][j] == 1)
+				if (matrix[i][j] == 1)
 					no_friends++;
 
 			if (no_friends > popular_friends) {
@@ -199,7 +199,7 @@ void popular(int ***matrix, char *name)
 			   get_user_name(most_popular), get_user_name(id));
 }
 
-void handle_input_friends(char *input, int ***matrix)
+void handle_input_friends(char *input, int **matrix)
 {
 	char *commands = strdup(input);
 	char *cmd = strtok(commands, "\n ");
@@ -223,4 +223,3 @@ void handle_input_friends(char *input, int ***matrix)
 
 	free(commands);
 }
-
