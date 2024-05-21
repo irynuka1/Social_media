@@ -21,7 +21,7 @@
  * @param names - the names of the users
  * @param op_type - the operation type (1 for add, 0 for remove)
 */
-void add_remove_friend(int ***matrix, char *names, int op_type);
+void add_remove_friend(int **matrix, char *names, int op_type);
 
 /**
  * Function that finds the suggestions for a user
@@ -29,7 +29,7 @@ void add_remove_friend(int ***matrix, char *names, int op_type);
  * @param matrix - the matrix of friends
  * @param name - the name of the user
 */
-void suggestions(int ***matrix, char *name);
+void suggestions(int **matrix, char *name);
 
 /**
  * Function that finds the distance between two users
@@ -37,7 +37,7 @@ void suggestions(int ***matrix, char *name);
  * @param matrix - the matrix of friends
  * @param names - the names of the users
 */
-void distance(int ***matrix, char *names);
+void distance(int **matrix, char *names);
 
 /**
  * Function that finds the common friends between two users
@@ -45,7 +45,7 @@ void distance(int ***matrix, char *names);
  * @param matrix - the matrix of friends
  * @param names - the names of the users
 */
-void common(int ***matrix, char *names);
+void common(int **matrix, char *names);
 
 /**
  * Function that finds the number of friends of a user
@@ -53,7 +53,7 @@ void common(int ***matrix, char *names);
  * @param matrix - the matrix of friends
  * @param name - the name of the user
 */
-void friends(int ***matrix, char *name);
+void friends(int **matrix, char *name);
 
 /**
  * Function that finds the most popular user
@@ -61,7 +61,7 @@ void friends(int ***matrix, char *name);
  * @param matrix - the matrix of friends
  * @param name - the name of the user
 */
-void popular(int ***matrix, char *name);
+void popular(int **matrix, char *name);
 
 /**
  * Function that handles the input for the friends task
@@ -69,7 +69,6 @@ void popular(int ***matrix, char *name);
  * @param input - the input string
  * @param matrix - the matrix of friends
 */
-void handle_input_friends(char *input, int ***matrix);
+void handle_input_friends(char *input, int **matrix);
 
 #endif // FRIENDS_H
-
