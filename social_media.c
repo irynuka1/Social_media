@@ -15,17 +15,17 @@
 */
 void init_tasks(void)
 {
-    #ifdef TASK_1
+	#ifdef TASK_1
 
-    #endif
+	#endif
 
-    #ifdef TASK_2
+	#ifdef TASK_2
 
-    #endif
+	#endif
 
-    #ifdef TASK_3
+	#ifdef TASK_3
 
-    #endif
+	#endif
 }
 
 /**
@@ -33,36 +33,56 @@ void init_tasks(void)
 */
 int main(void)
 {
-    init_users();
+	init_users();
 
-    init_tasks();
-    char *result = NULL, *input = (char *)malloc(MAX_COMMAND_LEN);
-    int **matrix = malloc(MAX_PEOPLE * sizeof(int *));
-    for(int i = 0; i < MAX_PEOPLE; i++)
-        matrix[i] = calloc(MAX_PEOPLE, sizeof(int));
-    while (1) {
-        result = fgets(input, MAX_COMMAND_LEN, stdin);
+	init_tasks();
+	
+	#ifdef TASK_1
+	// Initialize the friends matrix
+	int **matrix = malloc(MAX_PEOPLE * sizeof(int *));
+	for (int i = 0; i < MAX_PEOPLE; i++)
+		matrix[i] = calloc(MAX_PEOPLE, sizeof(int));
+	#endif
 
-        // If fgets returns null, we reached EOF
-        if (!result)
-            break;
+	#ifdef TASK_2
+	// Initialize the social media
+	posts_and_reposts_t *social_m = calloc(1, sizeof(posts_and_reposts_t));
+	social_m->pos_and_repos = calloc(1, sizeof(g_tree_t *));
+	social_m->pos_count = 1;
+	social_m->pos_and_repos[0] = NULL;
+	int index = 1;
+	#endif
 
-        #ifdef TASK_1
-        handle_input_friends(input, &matrix);
-        #endif
 
-        #ifdef TASK_2
-        handle_input_posts(input);
-        #endif
+	char *result = NULL, *input = (char *)malloc(MAX_COMMAND_LEN);
 
-        #ifdef TASK_3
-        handle_input_feed(input);
-        #endif
-    }
-    for(int i = 0; i < MAX_PEOPLE; i++)
-        free(matrix[i]);
-    free(matrix);
-    free(input);
-    free_users();
-    return 0;
+	while (1) {
+		result = fgets(input, MAX_COMMAND_LEN, stdin);
+
+		// If fgets returns null, we reached EOF
+		if (!result)
+			break;
+
+		#ifdef TASK_1
+		handle_input_friends(input, matrix);
+		#endif
+
+		#ifdef TASK_2
+		handle_input_posts(input, social_m, &index);
+		#endif
+
+		#ifdef TASK_3
+		handle_input_feed(input);
+		#endif
+	}
+
+	#ifdef TASK_1
+		for (int i = 0; i < MAX_PEOPLE; i++)
+			free(matrix[i]);
+		free(matrix);
+	#endif
+
+	free(input);
+	free_users();
+	return 0;
 }
