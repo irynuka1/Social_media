@@ -1,48 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "users.h"
 #include "posts.h"
+
 g_node_t *create_post(int *index, char *cmd)
 {
+	// Get the user id
 	cmd = strtok(NULL, " \n");
-
 	int id = get_user_id(cmd);
 
-	char *title = strtok(NULL, "\n");
+	// Get the post title
+	cmd = strtok(NULL, "\n");
 
-	g_node_t *root = calloc(1, sizeof(g_node_t));
+	// Create a new post
+	g_node_t *root = malloc(sizeof(g_node_t));
+	DIE(!root, "Malloc failed");
 
-	root->title = strdup(title);
-
-	root->id = *index;
-
+	// Initialize the post
+	root->title = strdup(cmd);
+	root->id = (*index)++;
 	root->user_id = id;
-
 	root->children = NULL;
-
 	root->children_count = 0;
 
-	(*index)++;
-
-	printf("Created %s for %s\n", title, get_user_name(id));
+	printf("Created %s for %s\n", cmd, get_user_name(id));
 
 	return root;
 }
 
-void add_post(posts_and_reposts_t *social_m, char *cmd, int *index)
+void add_post(posts_and_reposts_t *social_m, char *cmd)
 {
-	social_m->pos_and_repos[social_m->pos_count]->root = create_post(index,
-																	 cmd);
+	// Allocate memory for the new post
+	social_m->pr[social_m->count] = malloc(sizeof(g_tree_t));
+	DIE(!social_m->pr[social_m->count], "Malloc failed");
+	// Add the new post to the vector
+	social_m->pr[social_m->count]->root = create_post(&social_m->index, cmd);
 
-	social_m->pos_count++;
+	social_m->count++;
 
-	social_m->pos_and_repos = realloc(social_m->pos_and_repos,
-									  social_m->pos_count * sizeof(g_tree_t *));
+	// Resize the vector if necessary
+	if (social_m->count == social_m->max) {
+		social_m->max *= 2;
+		social_m->pr = realloc(social_m->pr, social_m->max *
+							   sizeof(g_tree_t *));
+	}
 }
 
-void handle_input_posts(char *input, posts_and_reposts_t *social_m, int *index)
+void handle_input_posts(char *input, posts_and_reposts_t *social_m)
 {
 	char *commands = strdup(input);
 	char *cmd = strtok(commands, "\n ");
@@ -51,7 +58,7 @@ void handle_input_posts(char *input, posts_and_reposts_t *social_m, int *index)
 		return;
 
 	if (!strcmp(cmd, "create"))
-		add_post(social_m, cmd, index);
+		add_post(social_m, cmd);
 	else if (!strcmp(cmd, "repost"))
 		(void)cmd;
 		// TODO: Add function
