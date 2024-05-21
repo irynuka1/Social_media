@@ -1,7 +1,7 @@
 #ifndef FRIENDS_H
 #define FRIENDS_H
 
-#define MAX_COMMAND_LEN 280
+#define MAX_COMMAND_LEN 500
 #define MAX_PEOPLE 550
 
 #define DIE(assertion, call_description)				\
