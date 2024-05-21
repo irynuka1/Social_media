@@ -47,10 +47,9 @@ int main(void)
 	#ifdef TASK_2
 	// Initialize the social media
 	posts_and_reposts_t *social_m = calloc(1, sizeof(posts_and_reposts_t));
-	social_m->pos_and_repos = calloc(1, sizeof(g_tree_t *));
-	social_m->pos_count = 1;
-	social_m->pos_and_repos[0] = NULL;
-	int index = 1;
+	social_m->pr = calloc(1, sizeof(g_tree_t *));
+	social_m->max = 1;
+	social_m->index = 1;
 	#endif
 
 
@@ -68,7 +67,7 @@ int main(void)
 		#endif
 
 		#ifdef TASK_2
-		handle_input_posts(input, social_m, &index);
+		handle_input_posts(input, social_m);
 		#endif
 
 		#ifdef TASK_3
